@@ -262,7 +262,7 @@ class ArachnysClient(object):
         if updates_since:
             if not isinstance(updates_since, datetime.date):
                 raise ValueError("'updates_since' must be a datetime.date instance")
-            params['updates_since'] = updates_since.isoformat()[:19]}
+            params['updates_since'] = updates_since.isoformat()[:19]
         return self.make_request('alert', 'get', alert_id, params=params)
 
     def register_alert(self, query, country=None):
