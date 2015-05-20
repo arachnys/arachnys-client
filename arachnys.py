@@ -97,8 +97,9 @@ class ArachnysClient(object):
 
     # Collections
 
-    def get_collections(self, filter=None):
-        params = {}
+    def get_collections(self, filter=None, params=None):
+        if params is None:
+            params = {}
         if filter is not None:
             params['filter'] = filter
         return self.make_request('collections', 'get', params=params)
@@ -130,8 +131,9 @@ class ArachnysClient(object):
 
     # Countries
 
-    def get_countries(self, filter=None):
-        params = {}
+    def get_countries(self, filter=None, params=None):
+        if params is None:
+            params = {}
         if filter is not None:
             params['name_filter'] = filter
         return self.make_request('countries', 'get', params=params)
@@ -176,8 +178,12 @@ class ArachnysClient(object):
         }
         return self.make_request('news', 'post', params=payload)
 
-    def get_news_search(self, uid, start=None):
-        params = {'start': start} if start else {}
+    def get_news_search(self, uid, start=None, params=None):
+        if params is None:
+            params = {}
+        # Keeping for backwards compatibility
+        if start:
+            params['start'] = start
         return self.make_request('news/' + str(uid), 'get', params=params)
 
     # SearchWorker / results
@@ -234,15 +240,15 @@ class ArachnysClient(object):
 
     def get_sources(self, country_iso_code=None, country_name=None,
                     category=None, country_region_name=None,
-                    regional_coverage=None, query=None):
-        params = {
-            'country_iso_code': country_iso_code,
-            'country_name': country_name,
-            'category': category,
-            'country_region_name': country_region_name,
-            'regional_coverage': regional_coverage,
-            'query': query,
-        }
+                    regional_coverage=None, query=None, params=None):
+        if params is None:
+            params = {}
+        params['country_iso_code'] = country_iso_code
+        params['country_name'] = country_name
+        params['category'] = category
+        params['country_region_name'] = country_region_name
+        params['regional_coverage'] = regional_coverage
+        params['query'] = query
         return self.make_request('sources', 'get', params=params)
 
     # Alerts
@@ -250,14 +256,14 @@ class ArachnysClient(object):
     def get_alerts(self):
         return self.make_request('alerts', 'get')
 
-    def get_alert_updates(self, alert_id, updates_since=None):
+    def get_alert_updates(self, alert_id, updates_since=None, params=None):
+        if params is None:
+            params = {}
         if updates_since:
             if not isinstance(updates_since, datetime.date):
                 raise ValueError("'updates_since' must be a datetime.date instance")
-            params = {'updates_since': updates_since.isoformat()[:19]}
-        else:
-            params = None
-        return self.make_request('alert', 'get', alert_id, params)
+            params['updates_since'] = updates_since.isoformat()[:19]}
+        return self.make_request('alert', 'get', alert_id, params=params)
 
     def register_alert(self, query, country=None):
         return self.make_request('alert', 'post', params={
